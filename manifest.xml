@@ -2,7 +2,28 @@
     <iq:application entry="SimpleApp" id="D1457A329800496B8C91BF6E3F057152" launcherIcon="@Drawables.LauncherIcon" name="@Strings.AppName" type="watch-app">
 
         <iq:products>
+            <iq:product id="d2bravo"/>
+            <iq:product id="d2bravo_titanium"/>
+            <iq:product id="d2charlie"/>
+            <iq:product id="descentmk1"/>
+            <iq:product id="edge820"/>
+            <iq:product id="edge520plus"/>
+            <iq:product id="edge1030"/>
+            <iq:product id="edge1030bontrager"/>
+            <iq:product id="fr645"/>
+            <iq:product id="fr645m"/>
             <iq:product id="fr935"/>
+            <iq:product id="fenix3"/>
+            <iq:product id="fenix3_hr"/>
+            <iq:product id="fenix5"/>
+            <iq:product id="fenix5plus"/>
+            <iq:product id="fenix5s"/>
+            <iq:product id="fenix5splus"/>
+            <iq:product id="fenix5x"/>
+            <iq:product id="fenix5xplus"/>
+            <iq:product id="fenixchronos"/>
+            <iq:product id="vivoactive3"/>
+            <iq:product id="vivoactive3m"/>
         </iq:products>
 
         <iq:permissions></iq:permissions>

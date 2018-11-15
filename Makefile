@@ -1,6 +1,7 @@
 include properties.mk
 
 appName = `grep entry manifest.xml | sed 's/.*entry="\([^"]*\).*/\1/'`
+devices = `grep 'iq:product id' manifest.xml | sed 's/.*iq:product id="\([^"]*\).*/\1/'`
 
 build:
 	$(SDK_HOME)/bin/monkeyc \
@@ -11,7 +12,7 @@ build:
 	--warn
 
 buildall:
-	@for device in $(SUPPORTED_DEVICES_LIST); do \
+	@for device in $(devices); do \
 		echo "-----"; \
 		echo "Building for" $$device; \
     $(SDK_HOME)/bin/monkeyc \
