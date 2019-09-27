@@ -2,6 +2,8 @@
 This is a seed project for writing [Garmin Connect IQ](http://developer.garmin.com/connect-iq/) applications. Instead of using the Eclipse plugin (which works rather poorly...),
 you can use any text editor of your choice and **compile**, **run** or **package** your project using *make*.
 
+**NOTICE:** This seed works will all Java versions **below** Java 12. The reason for this is, Java 12 stopped shipping with a JAR neccessary for the Garmin SDK. This applies to the Eclipse plugin, as well and will need to eventually be addressed by Garmin.
+
 ## Setup
 All you'll need to get started is edit the ```properties.mk``` file. Here's a description of the variables:
 
