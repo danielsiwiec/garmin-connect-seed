@@ -1,28 +1,37 @@
 //
-// Copyright 2015-2016 by Garmin Ltd. or its subsidiaries.
+// Copyright 2015-2021 by Garmin Ltd. or its subsidiaries.
 // Subject to Garmin SDK License Agreement and Wearables
 // Application Developer Agreement.
 //
 
-using Toybox.Application;
+import Toybox.Application;
+import Toybox.Lang;
+import Toybox.WatchUi;
 
+//! This app demonstrates how to use the Number Picker.
 class NumberPickerApp extends Application.AppBase {
 
-    function initialize() {
+    //! Constructor
+    public function initialize() {
         AppBase.initialize();
     }
 
-    // onStart() is called on application start up
-    function onStart(state) {
+    //! Handle app startup
+    //! @param state Startup arguments
+    public function onStart(state as Dictionary?) as Void {
     }
 
-    // onStop() is called when your application is exiting
-    function onStop(state) {
+    //! Handle app shutdown
+    //! @param state Shutdown arguments
+    public function onStop(state as Dictionary?) as Void {
     }
 
-    // Return the initial view of your application here
-    function getInitialView() {
-        return [ new NumberPickerView(), new BaseInputDelegate() ];
+    //! Return the initial views for the app
+    //! @return Array Pair [View, InputDelegate]
+    public function getInitialView() as Array<Views or InputDelegates>? {
+        var view = new $.NumberPickerView();
+        var delegate = new $.BaseInputDelegate(view);
+        return [view, delegate] as Array<Views or InputDelegates>;
     }
 
 }

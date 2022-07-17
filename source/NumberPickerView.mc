@@ -1,138 +1,109 @@
 //
-// Copyright 2015-2016 by Garmin Ltd. or its subsidiaries.
+// Copyright 2015-2021 by Garmin Ltd. or its subsidiaries.
 // Subject to Garmin SDK License Agreement and Wearables
 // Application Developer Agreement.
 //
 
-using Toybox.WatchUi;
-using Toybox.Graphics;
-using Toybox.System;
-using Toybox.Lang;
-using Toybox.Time.Gregorian;
+import Toybox.Graphics;
+import Toybox.Lang;
+import Toybox.Time;
+import Toybox.WatchUi;
 
-module NumberPickerConstants {
-    enum {
-        DISPLAY_FLOAT,
-        DISPLAY_INT,
-        DISPLAY_DURATION
-    }
-}
+typedef PickerType as Number or Float or Duration;
 
-var testValf = 1000f;
-var testVali = 1;
-var modeLabel = "";
-var fieldTypeToDisplay = null;
-var count = 0;
-var dur = null;
+//! Handles a Number Picker selection
+class PickerDelegate extends WatchUi.NumberPickerDelegate {
 
-class NPDf extends WatchUi.NumberPickerDelegate {
-    function initialize() {
+    private var _view as NumberPickerView;
+
+    //! Constructor
+    //! @param view The current view
+    public function initialize(view as NumberPickerView) {
         NumberPickerDelegate.initialize();
+        _view = view;
     }
 
-    function onNumberPicked(value) {
-        testValf = value;
-    }
-}
-
-class NPDi extends WatchUi.NumberPickerDelegate {
-    function initialize() {
-        NumberPickerDelegate.initialize();
-    }
-
-    function onNumberPicked(value) {
-        testVali = value;
+    //! Handle a number being entered
+    //! @param value The number that was entered
+    //! @return true if handled, false otherwise
+    public function onNumberPicked(value as PickerType) as Boolean {
+        _view.setCurrentValue(value);
+        return true;
     }
 }
 
-class NPDd extends WatchUi.NumberPickerDelegate {
-    function initialize() {
-        NumberPickerDelegate.initialize();
-    }
-
-    function onNumberPicked(value) {
-        dur = value;
-    }
-}
-
+//! Handle looping through the Number Pickers
 class BaseInputDelegate extends WatchUi.BehaviorDelegate {
-    var np;
-    var npi;
 
-    function initialize() {
+    private var _count as Number = 0;
+    private var _view as NumberPickerView;
+
+    //! Constructor
+    //! @param view The current view
+    public function initialize(view as NumberPickerView) {
         BehaviorDelegate.initialize();
+        _view = view;
     }
 
-    function onSelect() {
-        onMenu();
+    //! On select behavior, push new Number Picker
+    //! @return true if handled, false otherwise
+    public function onSelect() as Boolean {
+        return onMenu();
     }
 
-    function onMenu() {
-        if(WatchUi has :NumberPicker) {
-            var value;
-            if(count == 0) {
-                modeLabel = "Distance";
-                fieldTypeToDisplay = NumberPickerConstants.DISPLAY_FLOAT;
-                np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_DISTANCE, testValf);
-                WatchUi.pushView(np, new NPDf(), WatchUi.SLIDE_IMMEDIATE);
-                count = count + 1;
-            }
-            else if(count == 1) {
-                modeLabel = "Duration HH:MM:SS";
-                fieldTypeToDisplay = NumberPickerConstants.DISPLAY_DURATION;
+    //! On menu behavior, push new Number Picker
+    //! @return true if handled, false otherwise
+    public function onMenu() as Boolean {
+        if (WatchUi has :NumberPicker) {
+            if (_count == 0) {
+                _view.setModeLabel("Distance");
+                var value = 1000f;
+                var np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_DISTANCE, value);
+                WatchUi.pushView(np, new $.PickerDelegate(_view), WatchUi.SLIDE_IMMEDIATE);
+                _count++;
+            } else if (_count == 1) {
+                _view.setModeLabel("Duration HH:MM:SS");
                 // intentionally larger than max
-                value = Gregorian.duration({:hours=>9, :minutes=>8, :seconds=>10});
-                np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_TIME, value);
-                WatchUi.pushView(np, new NPDd(), WatchUi.SLIDE_IMMEDIATE);
-                count = count + 1;
-            }
-            else if(count == 2) {
-                modeLabel = "Duration MM:SS";
-                fieldTypeToDisplay = NumberPickerConstants.DISPLAY_DURATION;
-                value = Gregorian.duration({:hours=>1, :minutes=>8, :seconds=>10});
-                np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_TIME_MIN_SEC, value);
-                WatchUi.pushView(np, new NPDd(), WatchUi.SLIDE_IMMEDIATE);
-                count = count + 1;
-            }
-            else if(count == 3) {
-                modeLabel = "Time Of Day";
-                fieldTypeToDisplay = NumberPickerConstants.DISPLAY_DURATION;
-                value = Gregorian.duration({:hours=>23, :minutes=>8, :seconds=>10});
-                np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_TIME_OF_DAY, value);
-                WatchUi.pushView(np, new NPDd(), WatchUi.SLIDE_IMMEDIATE);
-                count = count + 1;
-            }
-            else if(count == 4) {
-                modeLabel = "Weight";
-                fieldTypeToDisplay = NumberPickerConstants.DISPLAY_FLOAT;
-                value = 454;
-                np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_WEIGHT, value);
-                WatchUi.pushView(np, new NPDf(), WatchUi.SLIDE_IMMEDIATE);
-                count = count + 1;
-            }
-            else if(count == 5) {
-                modeLabel = "Height";
-                fieldTypeToDisplay = NumberPickerConstants.DISPLAY_FLOAT;
-                value = 2;
-                np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_HEIGHT, value);
-                WatchUi.pushView(np, new NPDf(), WatchUi.SLIDE_IMMEDIATE);
-                count = count + 1;
-            }
-            else if(count == 6) {
-                modeLabel = "Calories";
-                fieldTypeToDisplay = NumberPickerConstants.DISPLAY_INT;
-                value = 200;
-                np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_CALORIES, value);
-                WatchUi.pushView(np, new NPDi(), WatchUi.SLIDE_IMMEDIATE);
-                count = count + 1;
-            }
-            else if(count == 7) {
-                modeLabel = "Birth Year";
-                fieldTypeToDisplay = NumberPickerConstants.DISPLAY_INT;
-                value = 1980;
-                np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_BIRTH_YEAR, value);
-                WatchUi.pushView(np, new NPDi(), WatchUi.SLIDE_IMMEDIATE);
-                count = 0;
+                var value = Time.Gregorian.duration({:hours=>9, :minutes=>8, :seconds=>10});
+                var np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_TIME, value);
+                WatchUi.pushView(np, new $.PickerDelegate(_view), WatchUi.SLIDE_IMMEDIATE);
+                _count++;
+            } else if (_count == 2) {
+                _view.setModeLabel("Duration MM:SS");
+                var value = Time.Gregorian.duration({:hours=>1, :minutes=>8, :seconds=>10});
+                var np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_TIME_MIN_SEC, value);
+                WatchUi.pushView(np, new $.PickerDelegate(_view), WatchUi.SLIDE_IMMEDIATE);
+                _count++;
+            } else if (_count == 3) {
+                _view.setModeLabel("Time Of Day");
+                var value = Time.Gregorian.duration({:hours=>23, :minutes=>8, :seconds=>10});
+                var np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_TIME_OF_DAY, value);
+                WatchUi.pushView(np, new $.PickerDelegate(_view), WatchUi.SLIDE_IMMEDIATE);
+                _count++;
+            } else if (_count == 4) {
+                _view.setModeLabel("Weight");
+                var value = 454;
+                var np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_WEIGHT, value);
+                WatchUi.pushView(np, new $.PickerDelegate(_view), WatchUi.SLIDE_IMMEDIATE);
+                _count++;
+            } else if (_count == 5) {
+                _view.setModeLabel("Height");
+                var value = 2;
+                var np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_HEIGHT, value);
+                WatchUi.pushView(np, new $.PickerDelegate(_view), WatchUi.SLIDE_IMMEDIATE);
+                _count++;
+            } else if (_count == 6) {
+                _view.setModeLabel("Calories");
+                var value = 200;
+                var np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_CALORIES, value);
+                WatchUi.pushView(np, new $.PickerDelegate(_view), WatchUi.SLIDE_IMMEDIATE);
+                _count++;
+            } else if (_count == 7) {
+                _view.setModeLabel("Birth Year");
+                var value = 1980;
+                var np = new WatchUi.NumberPicker(WatchUi.NUMBER_PICKER_BIRTH_YEAR, value);
+                WatchUi.pushView(np, new $.PickerDelegate(_view), WatchUi.SLIDE_IMMEDIATE);
+                _count = 0;
             }
             return true;
         }
@@ -140,25 +111,31 @@ class BaseInputDelegate extends WatchUi.BehaviorDelegate {
         return false;
     }
 
-    function onNextPage() {
-    }
 }
 
+//! Shows the current picked value
 class NumberPickerView extends WatchUi.View {
 
-    function initialize() {
+    private var _curValue as PickerType?;
+    private var _modeLabel as String = "";
+
+    //! Constructor
+    public function initialize() {
         View.initialize();
     }
 
-    function onLayout(dc) {
-        onUpdate(dc);
+    //! Load the resources
+    //! @param dc Device context
+    public function onLayout(dc as Dc) as Void {
     }
 
     //! Restore the state of the app and prepare the view to be shown
-    function onShow() {
+    public function onShow() as Void {
     }
 
-    function onUpdate(dc) {
+    //! Update the view to show the value picked
+    //! @param dc Device context
+    public function onUpdate(dc as Dc) as Void {
         dc.setColor(Graphics.COLOR_TRANSPARENT, Graphics.COLOR_BLACK);
         dc.clear();
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
@@ -168,30 +145,31 @@ class NumberPickerView extends WatchUi.View {
         var labelLocY = centerY - 10;
         var valueLocY = labelLocY + modeLabelFontHeight + 5;
 
-        if(WatchUi has :NumberPicker) {
+        if (WatchUi has :NumberPicker) {
             dc.drawText(centerX, (centerY - 50), Graphics.FONT_SMALL, "Press Menu Or Select", Graphics.TEXT_JUSTIFY_CENTER);
-            if(fieldTypeToDisplay != null) {
-
-                dc.drawText(centerX, labelLocY, Graphics.FONT_SMALL, modeLabel, Graphics.TEXT_JUSTIFY_CENTER);
-
-                if(fieldTypeToDisplay == NumberPickerConstants.DISPLAY_FLOAT) {
-                   dc.drawText(centerX, valueLocY, Graphics.FONT_SMALL, testValf.toString(), Graphics.TEXT_JUSTIFY_CENTER);
-                }
-
-                else if(fieldTypeToDisplay == NumberPickerConstants.DISPLAY_INT) {
-                   dc.drawText(centerX, valueLocY, Graphics.FONT_SMALL, testVali.toString(), Graphics.TEXT_JUSTIFY_CENTER);
-                }
-
-                else if(fieldTypeToDisplay == NumberPickerConstants.DISPLAY_DURATION) {
-                    if( dur != null ) {
-                        dc.drawText(centerX, valueLocY, Graphics.FONT_SMALL, dur.value().toString(), Graphics.TEXT_JUSTIFY_CENTER);
-                    }
+            var curValue = _curValue;
+            if (curValue != null) {
+                dc.drawText(centerX, labelLocY, Graphics.FONT_SMALL, _modeLabel, Graphics.TEXT_JUSTIFY_CENTER);
+                if (curValue instanceof Time.Duration) {
+                    dc.drawText(centerX, valueLocY, Graphics.FONT_SMALL, curValue.value().toString(), Graphics.TEXT_JUSTIFY_CENTER);
+                } else {
+                    dc.drawText(centerX, valueLocY, Graphics.FONT_SMALL, curValue.toString(), Graphics.TEXT_JUSTIFY_CENTER);
                 }
             }
-        }
-        else {
+        } else {
             dc.drawText(centerX, (centerY - 50), Graphics.FONT_SMALL, "NumberPicker not supported.", Graphics.TEXT_JUSTIFY_CENTER);
         }
     }
-}
 
+    //! Set the current value
+    //! @param value The value
+    public function setCurrentValue(value as PickerType) as Void {
+        _curValue = value;
+    }
+
+    //! Set the label for the value picked
+    //! @param label The label
+    public function setModeLabel(label as String) as Void {
+        _modeLabel = label;
+    }
+}
